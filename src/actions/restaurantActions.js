@@ -5,7 +5,7 @@ import {
     DELETE_RESTAURANT, 
     UPDATE_RESTAURANT,
     SET_CURRENT, 
-    CLEAR_CURRENT,
+    //CLEAR_CURRENT,
     SEARCH_RESTAURANTS
 } from './types';
 
@@ -107,14 +107,14 @@ export const setCurrent = restaurant => {
     }
 };
 
-// Nettoyer le restaurant actuel 
+/* Nettoyer le restaurant actuel 
 const clearCurrent = () => {
     return {
         type: CLEAR_CURRENT
     }
 };
 
-
+*/
 //Set loading to true
 export const setLoading = () => {
     return {

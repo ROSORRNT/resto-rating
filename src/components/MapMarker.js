@@ -4,7 +4,6 @@ import MapInfo from 'antd';
 
 const MapMarker = (props) => {
 
-
   return (
     <div >
       <span style={{ fontSize: '15px', color: 'black'}}  className="brand-red hide ">{props.name}</span>

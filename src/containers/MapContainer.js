@@ -9,6 +9,8 @@ import PlaceCard from '../components/PlaceCard'
 import MapStyle from '../components/Layout/MapStyle';
 //import MapAutoComplete from '../components/MapAutoComplete'
 import AddRestaurantModal from '../components/AddRestaurantModal';
+
+
 const MapContainer = ({  myMap: { userLocation }, setUserPosition }) => {
 
   useEffect(() => {
@@ -22,19 +24,26 @@ const MapContainer = ({  myMap: { userLocation }, setUserPosition }) => {
   //const [infoWindow, setInfoWindow] = useState([]);
   const [map, setMap] = useState({});
   const [mapsApi, setMapsApi] = useState({});
+  const [zoom, setZoom] = useState(15)
+  const [bounds, setBounds] = useState(null);
+  //const [latLng, setLatLng] = useState({});
+  //const [latLngBnds, setLatLngBnds] = useState({});
   const [placesService, setPlacesService] = useState({});
   const [autoCompleteService, setAutoCompleteService] = useState({});
   const [geoCoderService, setGeoCoderService] = useState({});
   let markers = []
- 
+
   const apiHasLoaded = ((map, mapsApi) => {
     setUserPos(userLocation)
     setMap(map);
     setMapsApi(mapsApi);
     setPlacesService(new mapsApi.places.PlacesService(map));
+    //setLatLng(new mapsApi.LatLng())
+    //setLatLngBnds(new mapsApi.LatLngBounds())
     setAutoCompleteService(new mapsApi.places.AutocompleteService())
     setGeoCoderService(new mapsApi.Geocoder())
     setMapsLoaded(true);
+    
   });
 
   const { Option } = Select;
@@ -46,11 +55,19 @@ const MapContainer = ({  myMap: { userLocation }, setUserPosition }) => {
     markers = []
     setUserPos(mapsApi.center)
     if(mapsLoaded === true){
-    handleSearch(star)}
+            
+      setZoom(map.getZoom())
+      setBounds(map.getBounds())
+     // myLatLng = new mapsApi.LatLng({lat: userPos.lat, lng: userPos.lng})
+      //console.log(bounds)
+      handleSearch(star)
+    }
   }
 
   const handleSearch = ((value) => {
+    
     setStar(value); // Set with option selected for filter
+    
     const filteredResults = []; // restaurants Array
     const placesRequest = {
       location: {lat: userPos.lat, lng: userPos.lng},
@@ -85,7 +102,7 @@ const MapContainer = ({  myMap: { userLocation }, setUserPosition }) => {
                   key: 'AIzaSyBIWvyyq6RD5MTxy2Rpd24ZLO_0kYAaDLw',
                   libraries: ['places', 'directions']
                 }}
-                defaultZoom={15} 
+                zoom={zoom} 
                 center={userPos}
                 options={createMapOptions}
                 onChange={onChangeHandler}
@@ -95,14 +112,7 @@ const MapContainer = ({  myMap: { userLocation }, setUserPosition }) => {
               {searchResults.map(place => {
 
                {/*markers.push({name: place.name, lat: place.coordinates.lat, lng: place.coordinates.lng})*/}
-               
-{/*
-                if(mapsLoaded){
-                infoWindow.push(new mapsApi.InfoWindow({
-                  content: getInfoWindowString(place),
-                }))}
-*/}               
-                
+
                 return (
                   
                   <MapMarker  key={place.id} name={place.name} lat={place.coordinates.lat} lng={place.coordinates.lng} />
@@ -152,8 +162,7 @@ const MapContainer = ({  myMap: { userLocation }, setUserPosition }) => {
 const mapStateToProps = state => ({
   
   myMap: state.map,
-  //restaurant: state.restaurant
- 
+
  });
 
 export default connect(mapStateToProps, { setUserPosition })(MapContainer);
