@@ -64,10 +64,10 @@ const PlaceCard = (({ resto }) => {
             </Tooltip>
         }/>}
         </div>
-        {showPhoto === true &&    
+        {    
           <Card
             hoverable
-            style={{ width: 270 }}
+            style={{ width: '100%', height: 'auto' }}
             cover={<img alt="example" src={resto.photo} />}
           />
         }

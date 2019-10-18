@@ -2,7 +2,7 @@ import React ,{ useState, useEffect } from 'react';
 import GoogleMapReact from 'google-map-react';
 import { connect } from 'react-redux';
 import { setUserPosition } from '../actions/mapActions';
-import { Select, Input } from 'antd';
+import { Select, Input, message } from 'antd';
 import MapMarker from '../components/MapMarker';
 import PlaceCard from '../components/PlaceCard'
 import MapStyle from '../components/Layout/MapStyle';
@@ -21,7 +21,7 @@ const MapContainer = ({  myMap: { userLocation }, setUserPosition }) => {
   const [star, setStar ] = useState(1)
   const [map, setMap] = useState({});
   const [mapsApi, setMapsApi] = useState({});
-  const [zoom, setZoom] = useState(15)
+  const [zoom, setZoom] = useState(16)
   const [placesService, setPlacesService] = useState({});
   const [autoCompleteService, setAutoCompleteService] = useState({});
   const [geoCoderService, setGeoCoderService] = useState({});
@@ -49,7 +49,6 @@ const MapContainer = ({  myMap: { userLocation }, setUserPosition }) => {
     setUserPos(mapsApi.center)
     if(mapsLoaded === true){
       setZoom(map.getZoom())
-      setBounds(map.getBounds())
       handleSearch(star)
     }
   }
@@ -67,6 +66,7 @@ const MapContainer = ({  myMap: { userLocation }, setUserPosition }) => {
         ...userMarkers,
         newUserMarker
       ])
+      message.success('Marqueur Ajouté', 4)
   });
 
   const handleSearch = ((value) => {
@@ -99,7 +99,7 @@ const MapContainer = ({  myMap: { userLocation }, setUserPosition }) => {
       <div> 
         <div className="row">
           <div >    
-            <section className="col s9 right">
+            <section className="col s8 right">
               <div style={{ height: '100vh', width: 'auto', paddingTop: '1%' }} >
                 <GoogleMapReact
                   bootstrapURLKeys={{
@@ -118,12 +118,12 @@ const MapContainer = ({  myMap: { userLocation }, setUserPosition }) => {
                 })}
                 {markers.map(marker => {
                   return (
-                    <MapMarker  key={marker.id}  lat={marker.lat} lng={marker.lng} />
+                    <MapMarker  key={marker.id} id={marker.id}  lat={marker.lat} lng={marker.lng} name={marker.name} />
                   );
                })}
                {userMarkers.map( marker => {
                   return (
-                  <UserMarker  key={marker.id}  lat={marker.lat} lng={marker.lng} name={marker.name} />
+                  <UserMarker  key={marker.id}   lat={marker.lat} lng={marker.lng} name={marker.name} />
                   )
                 })}
                 </GoogleMapReact>
@@ -132,7 +132,7 @@ const MapContainer = ({  myMap: { userLocation }, setUserPosition }) => {
           </div>
 
         {/* Results section */}
-        <section  style={{paddingTop: '1px'}} className="col s3 left">
+        <section  style={{paddingTop: '1px'}} className="col s4 left">
           <div >
           {mapsLoaded &&
             <div>
@@ -164,7 +164,7 @@ const MapContainer = ({  myMap: { userLocation }, setUserPosition }) => {
               <Option value="5"> A partir de 5 ★ </Option>
             </Select>
           {searchResults.length > 0 ?
-            <div className="collection ">
+            <div>
               <ul style={{height: '450px', width:'100%', overflow:'hidden', overflowY: 'scroll' }}>
               {searchResults.map((result) => (
                 <PlaceCard resto={result} key={result.id}  /> 
