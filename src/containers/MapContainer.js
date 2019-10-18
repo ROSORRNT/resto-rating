@@ -2,14 +2,12 @@ import React ,{ useState, useEffect } from 'react';
 import GoogleMapReact from 'google-map-react';
 import { connect } from 'react-redux';
 import { setUserPosition } from '../actions/mapActions';
-import { Select } from 'antd';
+import { Select, Input } from 'antd';
 import MapMarker from '../components/MapMarker';
-//import NavBar from '../components/Layout/NavBar';
 import PlaceCard from '../components/PlaceCard'
 import MapStyle from '../components/Layout/MapStyle';
-//import MapAutoComplete from '../components/MapAutoComplete'
-import AddRestaurantModal from '../components/AddRestaurantModal';
-
+import MapAutoComplete from '../components/MapAutoComplete';
+import UserMarker from '../components/UserMarker';
 
 const MapContainer = ({  myMap: { userLocation }, setUserPosition }) => {
 
@@ -21,16 +19,14 @@ const MapContainer = ({  myMap: { userLocation }, setUserPosition }) => {
   const [mapsLoaded, setMapsLoaded] = useState(false);
   const [userPos, setUserPos] = useState({"lat": 43.664175, "lng": 7.139873599999987});
   const [star, setStar ] = useState(1)
-  //const [infoWindow, setInfoWindow] = useState([]);
   const [map, setMap] = useState({});
   const [mapsApi, setMapsApi] = useState({});
   const [zoom, setZoom] = useState(15)
-  const [bounds, setBounds] = useState(null);
-  //const [latLng, setLatLng] = useState({});
-  //const [latLngBnds, setLatLngBnds] = useState({});
   const [placesService, setPlacesService] = useState({});
   const [autoCompleteService, setAutoCompleteService] = useState({});
   const [geoCoderService, setGeoCoderService] = useState({});
+  const [userMarkers, setUserMarkers] = useState([]);
+  const [constrains, setConstrains] = useState([{name: ''}])
   let markers = []
 
   const apiHasLoaded = ((map, mapsApi) => {
@@ -38,12 +34,9 @@ const MapContainer = ({  myMap: { userLocation }, setUserPosition }) => {
     setMap(map);
     setMapsApi(mapsApi);
     setPlacesService(new mapsApi.places.PlacesService(map));
-    //setLatLng(new mapsApi.LatLng())
-    //setLatLngBnds(new mapsApi.LatLngBounds())
     setAutoCompleteService(new mapsApi.places.AutocompleteService())
     setGeoCoderService(new mapsApi.Geocoder())
     setMapsLoaded(true);
-    
   });
 
   const { Option } = Select;
@@ -52,28 +45,40 @@ const MapContainer = ({  myMap: { userLocation }, setUserPosition }) => {
   })
 
   const onChangeHandler = (mapsApi) => {
-    markers = []
+
     setUserPos(mapsApi.center)
     if(mapsLoaded === true){
-            
       setZoom(map.getZoom())
       setBounds(map.getBounds())
-     // myLatLng = new mapsApi.LatLng({lat: userPos.lat, lng: userPos.lng})
-      //console.log(bounds)
       handleSearch(star)
     }
   }
 
+  const updateName = (e) => {
+    
+    setConstrains({name: e.target.value})
+  
+  }
+
+  const addMarker = ((lat, lng) => {
+    
+    let newUserMarker = {id: new Date(), lat, lng, name: constrains.name }
+      setUserMarkers([
+        ...userMarkers,
+        newUserMarker
+      ])
+  });
+
   const handleSearch = ((value) => {
     
     setStar(value); // Set with option selected for filter
-    
     const filteredResults = []; // restaurants Array
     const placesRequest = {
-      location: {lat: userPos.lat, lng: userPos.lng},
-      //radius: '30000', // Cannot be used with rankBy.
+
+      bounds: map.getBounds(),
+      radius: '1000', 
       type: ['restaurant'], 
-      rankBy: mapsApi.places.RankBy.DISTANCE // Cannot be used with radius.
+      
     };
     placesService.nearbySearch(placesRequest, ((response) => {
   
@@ -91,46 +96,61 @@ const MapContainer = ({  myMap: { userLocation }, setUserPosition }) => {
   });
 
     return( 
-      <div>
-      <AddRestaurantModal mapsApi={mapsApi} autoCompleteService={autoCompleteService} geoCoderService={geoCoderService} />
+      <div> 
         <div className="row">
-        <div >    
-          <section className="col s9 right">
-            <div style={{ height: '100vh', width: 'auto', paddingTop: '1%' }} >
-              <GoogleMapReact
-                bootstrapURLKeys={{
-                  key: 'AIzaSyBIWvyyq6RD5MTxy2Rpd24ZLO_0kYAaDLw',
-                  libraries: ['places', 'directions']
-                }}
-                zoom={zoom} 
-                center={userPos}
-                options={createMapOptions}
-                onChange={onChangeHandler}
-                yesIWantToUseGoogleMapApiInternals={true}
-                onGoogleApiLoaded={({ map, maps }) => apiHasLoaded(map, maps)}
-              >
-              {searchResults.map(place => {
-
-               {/*markers.push({name: place.name, lat: place.coordinates.lat, lng: place.coordinates.lng})*/}
-
-                return (
-                  
-                  <MapMarker  key={place.id} name={place.name} lat={place.coordinates.lat} lng={place.coordinates.lng} />
-                  
-                );
-              })}
-              </GoogleMapReact>
-            </div>
-          </section>
+          <div >    
+            <section className="col s9 right">
+              <div style={{ height: '100vh', width: 'auto', paddingTop: '1%' }} >
+                <GoogleMapReact
+                  bootstrapURLKeys={{
+                    key: 'AIzaSyBIWvyyq6RD5MTxy2Rpd24ZLO_0kYAaDLw',
+                    libraries: ['places', 'directions']
+                  }}
+                  zoom={zoom} 
+                  center={userPos}
+                  options={createMapOptions}
+                  onChange={onChangeHandler}
+                  yesIWantToUseGoogleMapApiInternals={true}
+                  onGoogleApiLoaded={({ map, maps }) => apiHasLoaded(map, maps)}
+                >
+                {searchResults.map(place => {
+                 markers.push({id: place.id, name: place.name, lat: place.coordinates.lat, lng: place.coordinates.lng})       
+                })}
+                {markers.map(marker => {
+                  return (
+                    <MapMarker  key={marker.id}  lat={marker.lat} lng={marker.lng} />
+                  );
+               })}
+               {userMarkers.map( marker => {
+                  return (
+                  <UserMarker  key={marker.id}  lat={marker.lat} lng={marker.lng} name={marker.name} />
+                  )
+                })}
+                </GoogleMapReact>
+              </div>
+            </section>
           </div>
 
         {/* Results section */}
         <section  style={{paddingTop: '1px'}} className="col s3 left">
           <div >
-          <h5  className=" align-center">Recherche par note</h5>
+          {mapsLoaded &&
+            <div>
+              <div >
+                <Input placeholder="Nom du Restaurant" onChange={(event) => updateName(event)} />
+                <MapAutoComplete
+                  autoCompleteService={autoCompleteService}
+                  geoCoderService={geoCoderService}
+                  addMarker={addMarker}
+                  map={map}
+                />
+              </div>
+            </div>
+          }
+              
             <Select
               showSearch
-              style={{ width: '90%' }}
+              style={{ width: '90%', paddingTop: '3%' }}
               placeholder="Note minimale"
               optionFilterProp="children"
               onChange={(value) => handleSearch(value)}
@@ -145,7 +165,7 @@ const MapContainer = ({  myMap: { userLocation }, setUserPosition }) => {
             </Select>
           {searchResults.length > 0 ?
             <div className="collection ">
-              <ul style={{height: '520px', width:'100%', overflow:'hidden', overflowY: 'scroll' }}>
+              <ul style={{height: '450px', width:'100%', overflow:'hidden', overflowY: 'scroll' }}>
               {searchResults.map((result) => (
                 <PlaceCard resto={result} key={result.id}  /> 
               ))}
