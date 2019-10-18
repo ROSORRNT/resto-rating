@@ -66,6 +66,8 @@ const MapContainer = ({  myMap: { userLocation }, setUserPosition }) => {
         ...userMarkers,
         newUserMarker
       ])
+      // clear field
+
       message.success('Marqueur Ajouté', 4)
   });
 
@@ -137,7 +139,12 @@ const MapContainer = ({  myMap: { userLocation }, setUserPosition }) => {
           {mapsLoaded &&
             <div>
               <div >
-                <Input placeholder="Nom du Restaurant" onChange={(event) => updateName(event)} />
+                <Input
+                style={{ width: '83%' }}
+                allowClear={true} 
+                placeholder="Nom du Restaurant" 
+                onChange={(event) => updateName(event)} />
+                
                 <MapAutoComplete
                   autoCompleteService={autoCompleteService}
                   geoCoderService={geoCoderService}

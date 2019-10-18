@@ -45,6 +45,7 @@ const MapAutoComplete = (props) => {
         dataSource={dataSource}
         onSelect={onSelect}
         onSearch={handleSearch}
+        allowClear={true} 
         style={{ height: 30, width: '90%' }}
         placeholder="Address"
      />
