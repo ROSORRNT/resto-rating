@@ -12,7 +12,7 @@ const MapAutoComplete = (props) => {
 
   const onSelect = ((value) => {
     props.geoCoderService.geocode({ address: value }, ((response) => {
-      props.addMarker( response[0].geometry.location.lat(), response[0].geometry.location.lng());
+      props.addRestaurant( value, response[0].geometry.location.lat(), response[0].geometry.location.lng());
     }))
   });
 

@@ -21,11 +21,11 @@ const MapContainer = ({  myMap: { userLocation }, setUserPosition }) => {
   const [star, setStar ] = useState(1)
   const [map, setMap] = useState({});
   const [mapsApi, setMapsApi] = useState({});
-  const [zoom, setZoom] = useState(16)
+  const [zoom, setZoom] = useState(14)
   const [placesService, setPlacesService] = useState({});
   const [autoCompleteService, setAutoCompleteService] = useState({});
   const [geoCoderService, setGeoCoderService] = useState({});
-  const [userMarkers, setUserMarkers] = useState([]);
+  const [userRestaurants, setUserRestaurants] = useState([]);
   const [constrains, setConstrains] = useState([{name: ''}])
   let markers = []
 
@@ -59,16 +59,18 @@ const MapContainer = ({  myMap: { userLocation }, setUserPosition }) => {
   
   }
 
-  const addMarker = ((lat, lng) => {
+  const addRestaurant = ((address, lat, lng) => {
     
-    let newUserMarker = {id: new Date(), lat, lng, name: constrains.name }
-      setUserMarkers([
-        ...userMarkers,
-        newUserMarker
+    let newUserRestaurant = {id: new Date(), address: address, lat, lng, name: constrains.name, ratings: {stars: [], comments: []}, photo: null  }
+      setUserRestaurants([
+        ...userRestaurants,
+        newUserRestaurant
       ])
       // clear field
 
       message.success('Marqueur Ajouté', 4)
+      //searchResults.push(newUserRestaurant)
+
   });
 
   const handleSearch = ((value) => {
@@ -102,7 +104,7 @@ const MapContainer = ({  myMap: { userLocation }, setUserPosition }) => {
         <div className="row">
           <div >    
             <section className="col s8 right">
-              <div style={{ height: '100vh', width: 'auto', paddingTop: '1%' }} >
+              <div style={{ height: '100vh', width: 'auto'}} >
                 <GoogleMapReact
                   bootstrapURLKeys={{
                     key: 'AIzaSyBIWvyyq6RD5MTxy2Rpd24ZLO_0kYAaDLw',
@@ -116,14 +118,15 @@ const MapContainer = ({  myMap: { userLocation }, setUserPosition }) => {
                   onGoogleApiLoaded={({ map, maps }) => apiHasLoaded(map, maps)}
                 >
                 {searchResults.map(place => {
+                  if(place.coordinates !== undefined){
                  markers.push({id: place.id, name: place.name, lat: place.coordinates.lat, lng: place.coordinates.lng})       
-                })}
+                }})}
                 {markers.map(marker => {
                   return (
                     <MapMarker  key={marker.id} id={marker.id}  lat={marker.lat} lng={marker.lng} name={marker.name} />
                   );
                })}
-               {userMarkers.map( marker => {
+               {userRestaurants.map( marker => {
                   return (
                   <UserMarker  key={marker.id}   lat={marker.lat} lng={marker.lng} name={marker.name} />
                   )
@@ -144,11 +147,11 @@ const MapContainer = ({  myMap: { userLocation }, setUserPosition }) => {
                 allowClear={true} 
                 placeholder="Nom du Restaurant" 
                 onChange={(event) => updateName(event)} />
-                
+
                 <MapAutoComplete
                   autoCompleteService={autoCompleteService}
                   geoCoderService={geoCoderService}
-                  addMarker={addMarker}
+                  addRestaurant={addRestaurant}
                   map={map}
                 />
               </div>
@@ -164,21 +167,26 @@ const MapContainer = ({  myMap: { userLocation }, setUserPosition }) => {
               filterOption={(input, option) =>
                 option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
               }>
-              <Option value="1"> A partir de 1 ★ </Option>
-              <Option value="2"> A partir de 2 ★ </Option>
-              <Option value="3"> A partir de 3 ★ </Option>
-              <Option value="4"> A partir de 4 ★ </Option>
-              <Option value="5"> A partir de 5 ★ </Option>
+              <Option value="1"> 1 à 5 ★ </Option>
+              <Option value="2"> 2 à 5 ★ </Option>
+              <Option value="3"> 3 à 5 ★ </Option>
+              <Option value="4"> 4 à 5 ★ </Option>
+              <Option value="5"> 5 à 5 ★ </Option>
             </Select>
           {searchResults.length > 0 ?
             <div>
-              <ul style={{height: '450px', width:'100%', overflow:'hidden', overflowY: 'scroll' }}>
-              {searchResults.map((result) => (
+              <ul style={{height: '490px', width:'100%', overflow:'hidden', overflowY: 'scroll' }}>
+              {userRestaurants.length > 0 && 
+              userRestaurants.map((result) => (
                 <PlaceCard resto={result} key={result.id}  /> 
               ))}
+              {searchResults.map((result) => (
+                <PlaceCard resto={result} key={result.id}  /> 
+              ))}           
               </ul>
             </div>
           : null}
+          
           </div>
         </section>
       </div>
