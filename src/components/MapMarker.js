@@ -5,9 +5,9 @@ const MapMarker = (props) => {
   let span
   let spanChild
 
-  /*
-
-const coucouH = () => {
+  
+/*
+const onIcon = () => {
  
   if (span == undefined){
     
@@ -19,15 +19,15 @@ const coucouH = () => {
   }
 }
 */
-  
+
   return (
     <div>
      
   
-      <span id={props.id} style={{ fontSize: '12px', color: 'blue' }}  className="brand-red"></span>
+      <span id={props.id} style={{ fontSize: '18px' }}  className="brand-red"></span>
      
     
-      <Icon className="font-1-5" type="environment" style={{ fontSize: '20px' }}   theme="twoTone" twoToneColor="#fd0000" />>
+      <Icon className="font-1-5" type="environment" style={{ fontSize: '20px' }}   theme="twoTone" twoToneColor="#fd0000" />
   
     </div>
   );
