@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import { Rate, Input, Card, Comment, Tooltip } from 'antd';
+import { Rate, Input, Card, Comment, Tooltip, message } from 'antd';
 import moment from 'moment';
 //import Preloader from './Layout/Preloader';
 
@@ -7,7 +7,7 @@ const PlaceCard = (({ resto }) => {
 
   const arrayStars = resto.ratings.stars.map(star => star)
   const [showInput, setShowInput] = useState(false);
-  const [showPhoto, setShowPhoto] = useState(false)
+  const [showPhoto, setShowPhoto] = useState(true)
   const [userComment, setUserComment] = useState('');
   const [stars, setStars] = useState(arrayStars[0]);
 
@@ -15,7 +15,8 @@ const PlaceCard = (({ resto }) => {
     
     setUserComment(e.target.value);
     setShowInput(true);
-
+    message.success('Commentaire ajouté')    
+    
   }
 
   const showPhotoHandler = () => {
@@ -32,6 +33,7 @@ const PlaceCard = (({ resto }) => {
         return sum + stars
     }, 0) / newArrayStars.length))
     setStars(newArrayStars)
+    message.success('Note Ajoutée')
   }
 
   return (
@@ -45,6 +47,7 @@ const PlaceCard = (({ resto }) => {
         <span> Note : <Rate 
           value={stars} 
           onChange={(e) => getStars(e) }
+
           />
         </span>
         { showInput === false &&
@@ -64,7 +67,7 @@ const PlaceCard = (({ resto }) => {
             </Tooltip>
         }/>}
         </div>
-        {    
+        { resto.photo !== null && showPhoto &&
           <Card
             hoverable
             style={{ width: '100%', height: 'auto' }}
