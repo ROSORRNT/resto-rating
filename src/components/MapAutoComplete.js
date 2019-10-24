@@ -11,6 +11,7 @@ const MapAutoComplete = (props) => {
   // Runs after clicking / Geocode the location selected to be created as a marker.
 
   const onSelect = ((value) => {
+    console.log(value)
     props.geoCoderService.geocode({ address: value }, ((response) => {
       props.addRestaurant( value, response[0].geometry.location.lat(), response[0].geometry.location.lng());
     }))
