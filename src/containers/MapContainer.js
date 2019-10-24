@@ -2,17 +2,20 @@ import React ,{ useState, useEffect } from 'react';
 import GoogleMapReact from 'google-map-react';
 import { connect } from 'react-redux';
 import { setUserPosition } from '../actions/mapActions';
-import { Select, Input, message } from 'antd';
+import { Select, Modal, Input, message } from 'antd';
+
 import MapMarker from '../components/MapMarker';
 import PlaceCard from '../components/PlaceCard'
 import MapStyle from '../components/Layout/MapStyle';
 import MapAutoComplete from '../components/MapAutoComplete';
 import UserMarker from '../components/UserMarker';
+import UserPosMarker from '../components/UserPosMarker'
 
 const MapContainer = ({  myMap: { userLocation }, setUserPosition }) => {
 
   useEffect(() => {
     setUserPosition();
+    
   }, []);
 
   const [searchResults, setSearchResults] = useState([]);
@@ -21,13 +24,17 @@ const MapContainer = ({  myMap: { userLocation }, setUserPosition }) => {
   const [star, setStar ] = useState(1)
   const [map, setMap] = useState({});
   const [mapsApi, setMapsApi] = useState({});
-  const [zoom, setZoom] = useState(14)
+  const [zoom, setZoom] = useState(15)
   const [placesService, setPlacesService] = useState({});
   const [autoCompleteService, setAutoCompleteService] = useState({});
   const [geoCoderService, setGeoCoderService] = useState({});
+  const [streetViewService, setStreetViewService] = useState({});
   const [userRestaurants, setUserRestaurants] = useState([]);
-  const [constrains, setConstrains] = useState([{name: ''}])
+  const [restoAdded, setRestoAdded] = useState([])
+  const [visible, setVisible] = useState(false) // Modal open when onMapClick
   let markers = []
+  const [name, setName] = useState('')
+  const [userPosMarker, setUserPosMarker] = useState({})
 
   const apiHasLoaded = ((map, mapsApi) => {
     setUserPos(userLocation)
@@ -36,16 +43,19 @@ const MapContainer = ({  myMap: { userLocation }, setUserPosition }) => {
     setPlacesService(new mapsApi.places.PlacesService(map));
     setAutoCompleteService(new mapsApi.places.AutocompleteService())
     setGeoCoderService(new mapsApi.Geocoder())
+    setStreetViewService(new mapsApi.StreetViewService())
     setMapsLoaded(true);
+    setUserPosMarker(userLocation)
   });
 
+// Set options of the map
   const { Option } = Select;
   const createMapOptions = (() => {
     return {styles: MapStyle}
   })
 
+// 
   const onChangeHandler = (mapsApi) => {
-
     setUserPos(mapsApi.center)
     if(mapsLoaded === true){
       setZoom(map.getZoom())
@@ -53,39 +63,24 @@ const MapContainer = ({  myMap: { userLocation }, setUserPosition }) => {
     }
   }
 
-  const updateName = (e) => {
-    
-    setConstrains({name: e.target.value})
-  
-  }
-
   const addRestaurant = ((address, lat, lng) => {
-    
-    let newUserRestaurant = {id: new Date(), address: address, lat, lng, name: constrains.name, ratings: {stars: [], comments: []}, photo: null  }
-      setUserRestaurants([
-        ...userRestaurants,
-        newUserRestaurant
-      ])
-      // clear field
-
-      message.success('Marqueur Ajouté', 4)
-      //searchResults.push(newUserRestaurant)
-
+    let newUserRestaurant = {id: new Date(), address: address, lat, lng, name: name, ratings: {stars: [], comments: []}, photo: null  }
+    setUserRestaurants([
+      ...userRestaurants,
+      newUserRestaurant
+    ])
+    message.success('Marqueur Ajouté', 4)
   });
 
-  const handleSearch = ((value) => {
-    
+  const handleSearch = ((value) => { 
     setStar(value); // Set with option selected for filter
     const filteredResults = []; // restaurants Array
     const placesRequest = {
-
       bounds: map.getBounds(),
       radius: '1000', 
       type: ['restaurant'], 
-      
     };
     placesService.nearbySearch(placesRequest, ((response) => {
-  
       let filtered = response.filter( res => res.rating >= value)
       let photoUrl = ''
       filtered.map( res => {
@@ -99,6 +94,38 @@ const MapContainer = ({  myMap: { userLocation }, setUserPosition }) => {
     }));
   });
 
+  const updateName = (e) => {
+    setName(e.target.value)
+    console.log(name)
+  }
+
+  const showModal = () => {
+    setVisible(true);
+  };
+
+  const handleOk = e => {
+   
+    let newrestoAdded = [...restoAdded]
+    newrestoAdded[restoAdded.length - 1].name = name
+    setRestoAdded(newrestoAdded)
+    setVisible(false);
+  };
+
+   const handleCancel = e => {
+    setVisible(false);
+  };
+
+  const onMapClick = ({lat, lng}) => {
+    let location = {lat: lat, lng: lng}
+    showModal()
+    let newrestoAdded = [
+      ...restoAdded, 
+      {id: new Date(), lat: lat, lng: lng, name: '', ratings: {stars: [], comments: []}, photo: null}
+    ]
+    //console.log(streetViewService.getPanorama({location: location, radius: 50}))
+    setRestoAdded(newrestoAdded)
+  }
+
     return( 
       <div> 
         <div className="row">
@@ -108,7 +135,7 @@ const MapContainer = ({  myMap: { userLocation }, setUserPosition }) => {
                 <GoogleMapReact
                   bootstrapURLKeys={{
                     key: 'AIzaSyBIWvyyq6RD5MTxy2Rpd24ZLO_0kYAaDLw',
-                    libraries: ['places', 'directions']
+                    libraries: ['places', 'streetview']
                   }}
                   zoom={zoom} 
                   center={userPos}
@@ -116,6 +143,7 @@ const MapContainer = ({  myMap: { userLocation }, setUserPosition }) => {
                   onChange={onChangeHandler}
                   yesIWantToUseGoogleMapApiInternals={true}
                   onGoogleApiLoaded={({ map, maps }) => apiHasLoaded(map, maps)}
+                  onClick={onMapClick}
                 >
                 {searchResults.map(place => {
                   if(place.coordinates !== undefined){
@@ -126,12 +154,32 @@ const MapContainer = ({  myMap: { userLocation }, setUserPosition }) => {
                     <MapMarker  key={marker.id} id={marker.id}  lat={marker.lat} lng={marker.lng} name={marker.name} />
                   );
                })}
-               {userRestaurants.map( marker => {
+               {restoAdded.map( marker => {
                   return (
                   <UserMarker  key={marker.id}   lat={marker.lat} lng={marker.lng} name={marker.name} />
                   )
                 })}
+                {userRestaurants.map( marker => {
+                  return (
+                  <UserMarker  key={marker.id}   lat={marker.lat} lng={marker.lng} name={marker.name} />
+                  )
+                })}
+                {userPosMarker && 
+                  <UserPosMarker key={new Date()} name="userPosition" lat={userPosMarker.lat} lng={userPosMarker.lng}  />
+                }
                 </GoogleMapReact>
+                <Modal
+                  title="Nommez Votre Restaurant"
+                  visible={visible}
+                  onOk={handleOk}
+                  onCancel={handleCancel}
+                >
+                  <Input
+                    style={{ width: '83%' }}
+                    allowClear={true} 
+                    placeholder="Nom du Restaurant" 
+                    onChange={(event) => updateName(event)} />
+                </Modal>
               </div>
             </section>
           </div>
@@ -147,7 +195,7 @@ const MapContainer = ({  myMap: { userLocation }, setUserPosition }) => {
                 allowClear={true} 
                 placeholder="Nom du Restaurant" 
                 onChange={(event) => updateName(event)} />
-
+                        
                 <MapAutoComplete
                   autoCompleteService={autoCompleteService}
                   geoCoderService={geoCoderService}
@@ -157,7 +205,6 @@ const MapContainer = ({  myMap: { userLocation }, setUserPosition }) => {
               </div>
             </div>
           }
-              
             <Select
               showSearch
               style={{ width: '90%', paddingTop: '3%' }}
@@ -175,14 +222,18 @@ const MapContainer = ({  myMap: { userLocation }, setUserPosition }) => {
             </Select>
           {searchResults.length > 0 ?
             <div>
-              <ul style={{height: '490px', width:'100%', overflow:'hidden', overflowY: 'scroll' }}>
+              <ul style={{height: '490px', width:'100%', overflow:'hidden', overflowY: 'scroll', paddingTop: '1%' }}>
+              {searchResults.map((result) => (
+                <PlaceCard resto={result} key={result.id}  /> 
+              ))}   
               {userRestaurants.length > 0 && 
               userRestaurants.map((result) => (
                 <PlaceCard resto={result} key={result.id}  /> 
               ))}
-              {searchResults.map((result) => (
+              {restoAdded.length > 0 && 
+                restoAdded.map((result) => (
                 <PlaceCard resto={result} key={result.id}  /> 
-              ))}           
+              ))}        
               </ul>
             </div>
           : null}
