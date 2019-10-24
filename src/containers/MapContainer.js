@@ -15,7 +15,6 @@ const MapContainer = ({  myMap: { userLocation }, setUserPosition }) => {
 
   useEffect(() => {
     setUserPosition();
-    
   }, []);
 
   const [searchResults, setSearchResults] = useState([]);
@@ -28,7 +27,7 @@ const MapContainer = ({  myMap: { userLocation }, setUserPosition }) => {
   const [placesService, setPlacesService] = useState({});
   const [autoCompleteService, setAutoCompleteService] = useState({});
   const [geoCoderService, setGeoCoderService] = useState({});
-  const [streetViewService, setStreetViewService] = useState({});
+  //const [streetViewService, setStreetViewService] = useState({});
   const [userRestaurants, setUserRestaurants] = useState([]);
   const [restoAdded, setRestoAdded] = useState([])
   const [visible, setVisible] = useState(false) // Modal open when onMapClick
@@ -43,7 +42,7 @@ const MapContainer = ({  myMap: { userLocation }, setUserPosition }) => {
     setPlacesService(new mapsApi.places.PlacesService(map));
     setAutoCompleteService(new mapsApi.places.AutocompleteService())
     setGeoCoderService(new mapsApi.Geocoder())
-    setStreetViewService(new mapsApi.StreetViewService())
+    //setStreetViewService(new mapsApi.StreetViewService())
     setMapsLoaded(true);
     setUserPosMarker(userLocation)
   });
@@ -96,7 +95,6 @@ const MapContainer = ({  myMap: { userLocation }, setUserPosition }) => {
 
   const updateName = (e) => {
     setName(e.target.value)
-    console.log(name)
   }
 
   const showModal = () => {
@@ -104,7 +102,6 @@ const MapContainer = ({  myMap: { userLocation }, setUserPosition }) => {
   };
 
   const handleOk = e => {
-   
     let newrestoAdded = [...restoAdded]
     newrestoAdded[restoAdded.length - 1].name = name
     setRestoAdded(newrestoAdded)
@@ -116,7 +113,6 @@ const MapContainer = ({  myMap: { userLocation }, setUserPosition }) => {
   };
 
   const onMapClick = ({lat, lng}) => {
-    let location = {lat: lat, lng: lng}
     showModal()
     let newrestoAdded = [
       ...restoAdded, 
@@ -237,7 +233,6 @@ const MapContainer = ({  myMap: { userLocation }, setUserPosition }) => {
               </ul>
             </div>
           : null}
-          
           </div>
         </section>
       </div>
