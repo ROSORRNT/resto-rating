@@ -1,0 +1,57 @@
+{
+  "restaurants": [
+    {
+      "id": 1,
+      "name": "La Spiaggia ",
+      "address": "12 Chemin des Roseaux, Cagnes-sur-Mer",
+      "coordinates": {
+        "lat": 43.6618342,
+        "lng": 7.140857399999959
+      },
+      "ratings": [
+        {
+          "id": "2019-10-02T07:11:04.609Z",
+          "comment": "On a très bien mangé",
+          "stars": 5
+        },
+        {
+          "id": "2019-10-02T07:11:04.1111",
+          "comment": "Un commentaire",
+          "stars": 3
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Gusto ",
+      "address": "2 Avenue de Grasse, Cagnes-sur-Mer",
+      "coordinates": {
+        "lat": 43.6566036,
+        "lng": 7.1465987999999925
+      },
+      "ratings": [
+        {
+          "id": "2019-10-02T13:08:44.646Z",
+          "comment": "Un super restaurant de fruits de mer",
+          "stars": 5
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Le Saint Pierre",
+      "address": "10 Route de France, Cagnes-sur-Mer",
+      "coordinates": {
+        "lat": 43.664175,
+        "lng": 7.139873599999987
+      },
+      "ratings": [
+        {
+          "id": "2019-10-03T11:28:07.449Z",
+          "comment": "Un commentaire ",
+          "stars": 4
+        }
+      ]
+    }
+  ]
+}
