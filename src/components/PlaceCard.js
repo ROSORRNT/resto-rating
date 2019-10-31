@@ -7,12 +7,12 @@ const PlaceCard = (({ resto, onDelete, onStreet, filterOption }) => {
   const [showInput, setShowInput] = useState(false);
   const [showPhoto, setShowPhoto] = useState(false);
   const [showComments, setShowComments] = useState(false);
-  let arrayStars = resto.stars.map( stars => stars);
+  let arrayStars = resto.stars.map( stars => stars); // Pour récupérer les notes déjà existantes sur le JSON
   let starsAverage = Math.round(arrayStars.reduce((sum, stars) => {
       return sum + stars
   }, 0) / arrayStars.length)
   const [stars, setStars] = useState(starsAverage);
-  let commentList = resto.comments.map( comment => comment)
+  let commentList = resto.comments.map( comment => comment) // Pour récupérer les commentaires déjà existants sur le JSON
   const [comments, setComments] = useState(commentList);
 
   const showPhotoHandler = () => {
@@ -39,9 +39,8 @@ const PlaceCard = (({ resto, onDelete, onStreet, filterOption }) => {
       ...arrayStars,
       e
     ]
-    newArrayStars = Math.ceil((newArrayStars.reduce((sum, stars) => 
-    {
-        return sum + stars
+    newArrayStars = Math.ceil((newArrayStars.reduce((sum, stars) => {
+      return sum + stars
     }, 0) / newArrayStars.length))
     setStars(newArrayStars)
     message.success('Note Ajoutée')
@@ -55,7 +54,7 @@ const PlaceCard = (({ resto, onDelete, onStreet, filterOption }) => {
 
   let hide = 'collection-item'
 
- if (filterOption !== undefined && stars < filterOption) {
+  if (filterOption !== undefined && stars < filterOption) {
     hide = 'hide'
   }
 

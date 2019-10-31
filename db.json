@@ -5,8 +5,8 @@
       "name": "La Spiaggia ",
       "address": "12 Chemin des Roseaux, Cagnes-sur-Mer",
       "coordinates": {
-        "lat": 43.6618342,
-        "lng": 7.140857399999959
+        "lat": 43.658533235637535,
+        "lng": 7.1511680072851505
       },
       "ratings": [
         {
@@ -26,8 +26,8 @@
       "name": "Gusto ",
       "address": "2 Avenue de Grasse, Cagnes-sur-Mer",
       "coordinates": {
-        "lat": 43.6566036,
-        "lng": 7.1465987999999925
+        "lat": 43.654001188992986,
+        "lng": 7.1557805317171415
       },
       "ratings": [
         {
@@ -42,8 +42,8 @@
       "name": "Le Saint Pierre",
       "address": "10 Route de France, Cagnes-sur-Mer",
       "coordinates": {
-        "lat": 43.664175,
-        "lng": 7.139873599999987
+        "lat": 43.65191592766266,
+        "lng": 7.153441695245419
       },
       "ratings": [
         {

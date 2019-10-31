@@ -18,10 +18,8 @@ export const getRestaurants = () => async dispatch => {
     meaning we can make the request to our backend and then wait get the response an then dispatch to the reducer
     */
         setLoading();
-
         const res = await fetch('http://localhost:5000/restaurants');
         const data = await res.json(); 
-        //console.log('coucou')
         dispatch({
             type: GET_RESTAURANTS,
             payload: data
@@ -32,7 +30,6 @@ export const getRestaurants = () => async dispatch => {
 export const addRestaurant = (restaurant) => async dispatch => {
 
         setLoading();
-
         const res = await fetch('/restaurants', {
             method: 'POST',
             body: JSON.stringify(restaurant),

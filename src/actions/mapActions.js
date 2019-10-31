@@ -6,25 +6,17 @@ import {
 // Set user position from Geolocation API
 
 export const setUserPosition = () => async dispatch => {
-
     if ("geolocation" in navigator) {
-
         setLoading();
-
-        navigator.geolocation.getCurrentPosition(function(position) {
-
+        navigator.geolocation.getCurrentPosition((position) => {
             const data = { lat: position.coords.latitude, lng: position.coords.longitude }
-
             dispatch({
                 type: SET_USER_POSITION,
                 payload: data
             })    
           });
-      
       } else {
-
             const data = { lat: null, lng: null }
-            
             dispatch({
                 type: SET_USER_POSITION,
                 payload: data
