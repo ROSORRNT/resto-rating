@@ -123,25 +123,12 @@ const MapContainer = ( {restaurant: { restaurants },  getRestaurants, myMap: { u
     setVisible(true);
   };
 
-  const handleOk = e => {
+  const handleOk = () => {
     let newrestoAdded = [...restoAdded]
     newrestoAdded[restoAdded.length - 1].name = name // set in updateName()
     newrestoAdded[restoAdded.length - 1].address = address // set in updateAdress()
     setRestoAdded(newrestoAdded)
-    setVisible(false);
-    let location = {
-      lat: restoAdded[restoAdded.length - 1].lat,
-      lng: restoAdded[restoAdded.length - 1].lng
-    }
-
-    let streetV = map.getStreetView()
-    streetV.setPosition(location);
-    streetV.setPov(/** @type {google.maps.StreetViewPov} */({
-      heading: 265,
-      pitch: 0
-    }));
-    streetV.setVisible(true)
-    
+    setVisible(false)
   };
 
    const handleCancel = e => {
