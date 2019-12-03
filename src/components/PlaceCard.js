@@ -7,12 +7,18 @@ const PlaceCard = (({ resto, onDelete, onStreet, filterOption }) => {
   const [showInput, setShowInput] = useState(false);
   const [showPhoto, setShowPhoto] = useState(false);
   const [showComments, setShowComments] = useState(false);
-  let arrayStars = resto.stars.map( stars => stars); // Pour récupérer les notes déjà existantes sur le JSON
+
+  // Récupérer les notes déjà existantes sur le JSON
+  let arrayStars = resto.stars.map( stars => stars); 
+
   let starsAverage = Math.round(arrayStars.reduce((sum, stars) => {
       return sum + stars
   }, 0) / arrayStars.length)
   const [stars, setStars] = useState(starsAverage);
-  let commentList = resto.comments.map( comment => comment) // Pour récupérer les commentaires déjà existants sur le JSON
+
+  // Récupérer les commentaires déjà existants sur le JSON
+  let commentList = resto.comments.map( comment => comment);
+
   const [comments, setComments] = useState(commentList);
 
   const showPhotoHandler = () => {
@@ -45,15 +51,14 @@ const PlaceCard = (({ resto, onDelete, onStreet, filterOption }) => {
     setStars(newArrayStars)
     message.success('Note Ajoutée')
   }
-  
-  let color = 'rgb(219, 208, 201)'
 
+  // Définir une couleur spéciale pour les restaurants de l'utilisateur
+  let color = 'rgb(219, 208, 201)'
   if (resto.restoUser === true) {
      color = 'rgb(255, 209, 182)'
   }
 
   let hide = 'collection-item'
-
   if (filterOption !== undefined && stars < filterOption) {
     hide = 'hide'
   }

@@ -2,7 +2,6 @@ import React from 'react';
 import { Icon } from 'antd';
 
 const UserMarker = (props) => {
-console.log(props)
   return (
     <div >
       <span style={{ fontSize: '15px', color: 'black'}}  className="brand-blue "></span>

@@ -1,7 +1,7 @@
 import React ,{ useState, useEffect } from 'react';
 import GoogleMapReact from 'google-map-react';
 import { connect } from 'react-redux';
-import { setUserPosition } from '../actions/mapActions';
+import { getUserPosition } from '../actions/mapActions';
 import { getRestaurants } from '../actions/restaurantActions';
 import { Select, Modal, Input, message } from 'antd';
 import MapMarker from '../components/MapMarker';
@@ -11,10 +11,12 @@ import MapAutoComplete from '../components/MapAutoComplete';
 import UserMarker from '../components/UserMarker';
 import UserPosMarker from '../components/UserPosMarker';
 
-const MapContainer = ( {restaurant: { restaurants },  getRestaurants, myMap: { userLocation }, setUserPosition} ) => {
+const MapContainer = ( {restaurant: { restaurants },  getRestaurants, myMap: { userLocation }, getUserPosition} ) => {
 
   useEffect(() => {
-    setUserPosition();
+    getUserPosition();
+  }, []);
+  useEffect(() => {
     getRestaurants();
   }, []);
 
@@ -28,7 +30,6 @@ const MapContainer = ( {restaurant: { restaurants },  getRestaurants, myMap: { u
   const [placesService, setPlacesService] = useState({});
   const [autoCompleteService, setAutoCompleteService] = useState({});
   const [geoCoderService, setGeoCoderService] = useState({});
-  const [streetViewService, setStreetViewService] = useState({});
   const [restoAdded, setRestoAdded] = useState([]); // user's restaurants list
   const [visible, setVisible] = useState(false); // Modal open when onMapClick
   const [name, setName] = useState(''); // set in updateName() for all restoAdded
@@ -43,10 +44,9 @@ const MapContainer = ( {restaurant: { restaurants },  getRestaurants, myMap: { u
     setPlacesService(new mapsApi.places.PlacesService(map));
     setAutoCompleteService(new mapsApi.places.AutocompleteService())
     setGeoCoderService(new mapsApi.Geocoder())
-    setStreetViewService(new mapsApi.StreetViewService())
     setMapsLoaded(true);
     setUserPosMarker(userLocation)
-    // SStorage of recovered restaurants from JSON file
+    // Storage of recovered restaurants from JSON file
     if(restaurants != null ) {
       let restoList = []
       restaurants.map(resto => {
@@ -206,7 +206,7 @@ const MapContainer = ( {restaurant: { restaurants },  getRestaurants, myMap: { u
                 {userPosMarker && 
                   <UserPosMarker key={new Date()} name="userPosition" lat={userPosMarker.lat} lng={userPosMarker.lng}  />
                 }
-                </GoogleMapReact>
+                </GoogleMapReact> 
                 <Modal
                   title="Nommez Votre Restaurant"
                   visible={visible}
@@ -297,4 +297,4 @@ const mapStateToProps = state => ({
   myMap: state.map,
  });
 
-export default connect(mapStateToProps, { setUserPosition, getRestaurants })(MapContainer);
+export default connect(mapStateToProps, { getUserPosition, getRestaurants })(MapContainer);

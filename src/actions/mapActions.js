@@ -4,8 +4,11 @@ import {
 } from './types';
 
 // Set user position from Geolocation API
-
-export const setUserPosition = () => async dispatch => {
+/* redux thunk allows us to returning a function directly 
+it takes a dispatch which allow us to dispatch to the reducer at any time (dispatch a type and a payload)
+meaning we can make the request to our backend and then wait get the response an then dispatch to the reducer
+*/
+export const getUserPosition = () => async (dispatch) => {
     if ("geolocation" in navigator) {
         setLoading();
         navigator.geolocation.getCurrentPosition((position) => {
@@ -23,9 +26,6 @@ export const setUserPosition = () => async dispatch => {
             })
       };
 };
-
-// Get Places 
-
 
 //Set loading to true
 export const setLoading = () => {
