@@ -104,8 +104,10 @@ const MapContainer = ( {restaurant: { restaurants },  getRestaurants, myMap: { u
         if(res.photos && res.photos[0].getUrl() !== undefined) {
             photoUrl = res.photos[0].getUrl()
         }
-        const restoPlace = {id: res.id, name: res.name, photo: photoUrl, restoUser: false, stars: [res.rating], comments: [], address:res.vicinity, coordinates: { lat:res.geometry.location.lat(),lng:res.geometry.location.lng() } }
-        filteredResults.push(restoPlace)
+        const restoPlace = {
+          id: res.id, name: res.name, photo: photoUrl, restoUser: false, stars: [res.rating], comments: [], address:res.vicinity, coordinates: { lat:res.geometry.location.lat(),lng:res.geometry.location.lng() } 
+        };
+        filteredResults.push(restoPlace);
      })
       setSearchResults(filteredResults);
     }));
@@ -130,7 +132,7 @@ const MapContainer = ( {restaurant: { restaurants },  getRestaurants, myMap: { u
   // Set the name that has just been added
   const updateName = (e) => {
     setName(e.target.value);
-  }
+  };
 
   // const updateAddress = (e) => {
   //   setAddress(e.target.value)
@@ -143,34 +145,34 @@ const MapContainer = ( {restaurant: { restaurants },  getRestaurants, myMap: { u
       {id: new Date(), lat: lat, lng: lng, name: '', stars: [], comments: [], photo: null, restoUser: true},
       ...restoAdded
     ]
-    setRestoAdded(newrestoAdded)
-  }
+    setRestoAdded(newrestoAdded);
+  };
 
   // Set the updated name of the restauant that has just been added
   const handleOk = () => {
-    let newrestoAdded = [...restoAdded]
+    let newrestoAdded = [...restoAdded];
     newrestoAdded[0].name = name // set in updateName()
     newrestoAdded[0].address = address // set in updateAdress()
-    setRestoAdded(newrestoAdded)
-    setVisible(false)
+    setRestoAdded(newrestoAdded);
+    setVisible(false);
   };
 
   // delete the item that has just been added
    const handleCancel = e => {
     let newrestoAdded = [...restoAdded]
-    newrestoAdded.pop()
-    setRestoAdded(newrestoAdded)
+    newrestoAdded.shift();
+    setRestoAdded(newrestoAdded);
     setVisible(false);
   };
 
 // Delete a restaurant
   const onDelete = (id) => {
-    let newResults = searchResults.filter( res => res.id !== id)
-    setSearchResults(newResults)
-    let newAdded = restoAdded.filter(res => res.id !== id)
-    setRestoAdded(newAdded)
-    message.success('Restaurant Supprimé', 4)
-  }
+    let newResults = searchResults.filter( res => res.id !== id);
+    setSearchResults(newResults);
+    let newAdded = restoAdded.filter(res => res.id !== id);
+    setRestoAdded(newAdded);
+    message.success('Restaurant Supprimé', 4);
+  };
 
 // Get and display the street view of a restauarnt 
   const onStreet = (id) => {
