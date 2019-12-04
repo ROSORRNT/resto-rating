@@ -7,19 +7,15 @@ const PlaceCard = (({ resto, onDelete, onStreet, filterOption }) => {
   const [showInput, setShowInput] = useState(false);
   const [showPhoto, setShowPhoto] = useState(false);
   const [showComments, setShowComments] = useState(false);
-
-  // Récupérer les notes déjà existantes sur le JSON
-  let arrayStars = resto.stars.map( stars => stars); 
-
+  // Récupérer les notes et commentaires déjà existants sur le JSON
+  let arrayStars = [...resto.stars]; 
   let starsAverage = Math.round(arrayStars.reduce((sum, stars) => {
       return sum + stars
   }, 0) / arrayStars.length)
+  let commentList = [...resto.comments];
+  const [comments, setComments] = useState(commentList); 
   const [stars, setStars] = useState(starsAverage);
-
-  // Récupérer les commentaires déjà existants sur le JSON
-  let commentList = resto.comments.map( comment => comment);
-
-  const [comments, setComments] = useState(commentList);
+  const [canRate, setCanRate] = useState(true);
 
   const showPhotoHandler = () => {
     setShowPhoto(!showPhoto);
@@ -35,21 +31,26 @@ const PlaceCard = (({ resto, onDelete, onStreet, filterOption }) => {
       e.target.value
     ]
     setComments(newComments);
-    setShowInput(true);
+    setShowInput(true); // Delete this line allow the user to put multiple comments
     setShowComments(true);
     message.success('Commentaire ajouté')    
   }
 
   const starsEdit = (e) => {
-    let newArrayStars = [
-      ...arrayStars,
-      e
-    ]
-    newArrayStars = Math.ceil((newArrayStars.reduce((sum, stars) => {
-      return sum + stars
-    }, 0) / newArrayStars.length))
-    setStars(newArrayStars)
-    message.success('Note Ajoutée')
+    if (canRate === false) {
+      message.error('Note déja ajoutée')   
+    } else {
+      let newArrayStars = [
+        ...arrayStars,
+        e
+      ]
+      newArrayStars = Math.ceil((newArrayStars.reduce((sum, stars) => {
+        return sum + stars
+      }, 0) / newArrayStars.length))
+      setStars(newArrayStars)
+      setCanRate(false)
+      message.success('Note Ajoutée')
+    }
   }
 
   // Définir une couleur spéciale pour les restaurants de l'utilisateur
