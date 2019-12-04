@@ -12,12 +12,13 @@ import UserPosMarker from '../components/UserPosMarker';
 
 const MapContainer = ( {restaurant: { restaurants },  getRestaurants, myMap: { userLocation }, getUserPosition} ) => {
 
+  // Call the action that will fetch the restaurants on the server
   useEffect(() => {
     getRestaurants();
   }, [getRestaurants]);
 
+  // Creates a list from recovered restaurants from JSON file
   useEffect(() => {
-    // Storage of recovered restaurants from JSON file
     if (restaurants !== null){
       let restoList = []
       restaurants.map(resto => {
@@ -30,11 +31,12 @@ const MapContainer = ( {restaurant: { restaurants },  getRestaurants, myMap: { u
         let newRestoList = [
           ...restoList
         ]
-        setRestoAdded(newRestoList)
+        setRestoAdded(newRestoList);
       })
     }
   }, [restaurants]);
 
+  // Call the action that retrieves the user’s position
   useEffect(() => {
     getUserPosition();
   }, [getUserPosition]);
@@ -70,14 +72,14 @@ const MapContainer = ( {restaurant: { restaurants },  getRestaurants, myMap: { u
     setMapsLoaded(true);
   });
 
-  const { Option } = Select;
   // Set options of the map
+  const { Option } = Select;
   const createMapOptions = (() => {
     return {styles: MapStyle,
       streetViewControl: false }
   })
 
-// call when a change occurs on the map
+  // Called when a change occurs on the map
   const onChangeHandler = (mapsApi) => {
     setUserPos(mapsApi.center)
     if(mapsLoaded === true){
@@ -85,19 +87,11 @@ const MapContainer = ( {restaurant: { restaurants },  getRestaurants, myMap: { u
       handleSearch(star)
     }
   }
-// Call when user add a restaurant by the autocomplete input (not onMapClick)
-  const addRestaurant = ((address, lat, lng) => {
-    let newUserRestaurant = {id: new Date(), address: address, lat, lng, name: name, stars: [], comments: [], photo: null, restoUser: true  }
-    setRestoAdded([
-      ...restoAdded,
-      newUserRestaurant
-    ])
-    message.success('Marqueur Ajouté', 4)
-  });
-// Call on the first loading and each time the user selects an option (for filtering)
+
+  // Called on the first loading, each time an option has selected, and when a change occurs on the map
   const handleSearch = ((value) => { 
-    setStar(value); // Set with option selected for filter
-    const filteredResults = []; // restaurants Array
+    setStar(value); // Set with option selected for filter (star)
+    const filteredResults = [];
     const placesRequest = {
       bounds: map.getBounds(),
       radius: '1000', 
@@ -117,26 +111,51 @@ const MapContainer = ( {restaurant: { restaurants },  getRestaurants, myMap: { u
     }));
   });
 
-  const updateName = (e) => {
-    setName(e.target.value)
-  }
-
-  const updateAddress = (e) => {
-    setAddress(e.target.value)
-  }
+  // Call when user add a restaurant by the autocomplete input (not onMapClick)
+  const addRestaurant = ((address, lat, lng) => {
+    let newUserRestaurant = {
+      id: new Date(), address: address, lat, lng, name: name, stars: [], comments: [], photo: null, restoUser:true  
+    };
+    setRestoAdded([
+      newUserRestaurant,
+      ...restoAdded
+    ]);
+    message.success('Marqueur Ajouté', 4);
+  });
 
   const showModal = () => {
     setVisible(true);
   };
 
+  // Set the name that has just been added
+  const updateName = (e) => {
+    setName(e.target.value);
+  }
+
+  // const updateAddress = (e) => {
+  //   setAddress(e.target.value)
+  // }
+
+  // Add a new restaurant with the coordinate of the click
+  const onMapClick = ({lat, lng}) => {
+    showModal();
+    let newrestoAdded = [
+      {id: new Date(), lat: lat, lng: lng, name: '', stars: [], comments: [], photo: null, restoUser: true},
+      ...restoAdded
+    ]
+    setRestoAdded(newrestoAdded)
+  }
+
+  // Set the updated name of the restauant that has just been added
   const handleOk = () => {
     let newrestoAdded = [...restoAdded]
-    newrestoAdded[restoAdded.length - 1].name = name // set in updateName()
-    newrestoAdded[restoAdded.length - 1].address = address // set in updateAdress()
+    newrestoAdded[0].name = name // set in updateName()
+    newrestoAdded[0].address = address // set in updateAdress()
     setRestoAdded(newrestoAdded)
     setVisible(false)
   };
 
+  // delete the item that has just been added
    const handleCancel = e => {
     let newrestoAdded = [...restoAdded]
     newrestoAdded.pop()
@@ -144,16 +163,8 @@ const MapContainer = ( {restaurant: { restaurants },  getRestaurants, myMap: { u
     setVisible(false);
   };
 
-  const onMapClick = ({lat, lng}) => {
-    showModal()
-    let newrestoAdded = [
-      ...restoAdded, 
-      {id: new Date(), lat: lat, lng: lng, name: '', stars: [], comments: [], photo: null, restoUser: true}
-    ]
-    setRestoAdded(newrestoAdded)
-  }
+// Delete a restaurant
   const onDelete = (id) => {
-      
     let newResults = searchResults.filter( res => res.id !== id)
     setSearchResults(newResults)
     let newAdded = restoAdded.filter(res => res.id !== id)
@@ -161,6 +172,7 @@ const MapContainer = ( {restaurant: { restaurants },  getRestaurants, myMap: { u
     message.success('Restaurant Supprimé', 4)
   }
 
+// Get and display the street view of a restauarnt 
   const onStreet = (id) => {
     let resto = restoAdded.filter( res => res.id === id)
     let location = {
@@ -195,27 +207,30 @@ const MapContainer = ( {restaurant: { restaurants },  getRestaurants, myMap: { u
                   onGoogleApiLoaded={({ map, maps }) => apiHasLoaded(map, maps)}
                   onClick={onMapClick}
                 >
+                {/* Create the marker list with the search results*/}
                 {searchResults.map(place => {
                   if(place.coordinates !== undefined){
                  markers.push({id: place.id, name: place.name, lat: place.coordinates.lat, lng: place.coordinates.lng})       
                 }})}
-
+                {/* render the list of markers ( for restaurants recovered)*/} 
                 {markers.map(marker => {
                   return (
                     <MapMarker  key={marker.id} id={marker.id}  lat={marker.lat} lng={marker.lng} name={marker.name} restoUser={false} />
                   );
                })}
+               {/* Render the list of markers (for restaurants added)*/} 
                {restoAdded.map( marker => {
-                 
                   return (
                     <MapMarker  key={marker.id} id={marker.id}  lat={marker.lat} lng={marker.lng} name={marker.name} restoUser={true} />
                   )
                 })}
-                {/* Marker for identify the user position */}
+                {/* Render the user position marker */}
                 {userPosMarker && 
                   <UserPosMarker key={new Date()} name="userPosition" lat={userPosMarker.lat} lng={userPosMarker.lng}  />
                 }
                 </GoogleMapReact> 
+
+                {/* Modal for adding restaurant when the user click on map */}
                 <Modal
                   title="Nommez Votre Restaurant"
                   visible={visible}
@@ -227,36 +242,32 @@ const MapContainer = ( {restaurant: { restaurants },  getRestaurants, myMap: { u
                     allowClear={true} 
                     placeholder="Nom du Restaurant" 
                     onChange={(event) => updateName(event)} />
-                  <Input
+                  {/* <Input
                     style={{ width: '83%' }}
                     allowClear={true} 
                     placeholder="Adresse du Restaurant" 
-                    onChange={(event) => updateAddress(event)} />
+                    onChange={(event) => updateAddress(event)} /> */}
                 </Modal>
               </div>
             </section>
           </div>
 
-        {/* Results section */}
         <section  style={{paddingTop: '1px'}} className="col s4 left">
           <div >
           {mapsLoaded &&
-            <div>
-              <div >
+            <React.Fragment>
                 <Input
-                style={{ width: '83%' }}
-                allowClear={true} 
-                placeholder="Nom du Restaurant" 
-                onChange={(event) => updateName(event)} />
-                        
+                  style={{ width: '83%' }}
+                  allowClear={true} 
+                  placeholder="Nom du Restaurant" 
+                  onChange={(event) => updateName(event)} />        
                 <MapAutoComplete
                   autoCompleteService={autoCompleteService}
                   geoCoderService={geoCoderService}
                   addRestaurant={addRestaurant}
                   map={map}
                 />
-              </div>
-            </div>
+            </React.Fragment>
           }
             <Select
               showSearch
@@ -273,6 +284,7 @@ const MapContainer = ( {restaurant: { restaurants },  getRestaurants, myMap: { u
               <Option value="4"> 4 à 5 ★ </Option>
               <Option value="5"> 5 à 5 ★ </Option>
             </Select>
+            {/* Qwery Results */}
           {searchResults.length > 0 ?
             <div>
               <ul style={{height: '490px', width:'100%', overflow:'hidden', overflowY: 'scroll', paddingTop: '1%' }}>
