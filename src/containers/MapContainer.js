@@ -8,7 +8,6 @@ import MapMarker from '../components/MapMarker';
 import PlaceCard from '../components/PlaceCard';
 import MapStyle from '../components/Layout/MapStyle';
 import MapAutoComplete from '../components/MapAutoComplete';
-import UserMarker from '../components/UserMarker';
 import UserPosMarker from '../components/UserPosMarker';
 
 const MapContainer = ( {restaurant: { restaurants },  getRestaurants, myMap: { userLocation }, getUserPosition} ) => {
@@ -200,16 +199,19 @@ const MapContainer = ( {restaurant: { restaurants },  getRestaurants, myMap: { u
                   if(place.coordinates !== undefined){
                  markers.push({id: place.id, name: place.name, lat: place.coordinates.lat, lng: place.coordinates.lng})       
                 }})}
+
                 {markers.map(marker => {
                   return (
-                    <MapMarker  key={marker.id} id={marker.id}  lat={marker.lat} lng={marker.lng} name={marker.name} />
+                    <MapMarker  key={marker.id} id={marker.id}  lat={marker.lat} lng={marker.lng} name={marker.name} restoUser={false} />
                   );
                })}
                {restoAdded.map( marker => {
+                 
                   return (
-                    <UserMarker  key={marker.id}   lat={marker.lat} lng={marker.lng} name={marker.name} />
+                    <MapMarker  key={marker.id} id={marker.id}  lat={marker.lat} lng={marker.lng} name={marker.name} restoUser={true} />
                   )
                 })}
+                {/* Marker for identify the user position */}
                 {userPosMarker && 
                   <UserPosMarker key={new Date()} name="userPosition" lat={userPosMarker.lat} lng={userPosMarker.lng}  />
                 }
