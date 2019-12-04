@@ -1,14 +1,11 @@
 import React from 'react';
 import { Icon } from 'antd';
 
-const UserPosMarker = (props) => {
+const UserPosMarker = props => {
 
   return (
     <div>
-     
-    <span  className="brand-red"></span>
-    <Icon type="home" style={{ fontSize: '20px' }}  theme="twoTone" />
-
+      <span className="brand-red"><Icon type="home" style={{ fontSize: '20px' }}  theme="twoTone" /></span>
   </div>
   );
 };
