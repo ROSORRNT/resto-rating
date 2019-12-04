@@ -14,40 +14,12 @@ import UserPosMarker from '../components/UserPosMarker';
 const MapContainer = ( {restaurant: { restaurants },  getRestaurants, myMap: { userLocation }, getUserPosition} ) => {
 
   useEffect(() => {
-    getUserPosition();
-  }, []);
-  useEffect(() => {
     getRestaurants();
-  }, []);
+  }, [getRestaurants]);
 
-  const [searchResults, setSearchResults] = useState([]); // results of nearbySearch request 
-  const [mapsLoaded, setMapsLoaded] = useState(false); // reset to true when api has loaded
-  const [userPos, setUserPos] = useState({"lat": 43.664175, "lng": 7.139873599999987}); // for set center of map with userLocation
-  const [star, setStar ] = useState(1); //filter option
-  const [map, setMap] = useState({}); // for manipulate the map ex: map.getBounds()
-  const [mapsApi, setMapsApi] = useState({}); // to access service ex: mapsApi.Geocoder()
-  const [zoom, setZoom] = useState(15); 
-  const [placesService, setPlacesService] = useState({});
-  const [autoCompleteService, setAutoCompleteService] = useState({});
-  const [geoCoderService, setGeoCoderService] = useState({});
-  const [restoAdded, setRestoAdded] = useState([]); // user's restaurants list
-  const [visible, setVisible] = useState(false); // Modal open when onMapClick
-  const [name, setName] = useState(''); // set in updateName() for all restoAdded
-  const [address, setAddress] = useState(''); // set in updateAddress() for all restoAdded
-  const [userPosMarker, setUserPosMarker] = useState({}); 
-  let markers = [];
-  
-  const apiHasLoaded = ((map, mapsApi) => {
-    setUserPos(userLocation)
-    setMap(map);
-    setMapsApi(mapsApi);
-    setPlacesService(new mapsApi.places.PlacesService(map));
-    setAutoCompleteService(new mapsApi.places.AutocompleteService())
-    setGeoCoderService(new mapsApi.Geocoder())
-    setMapsLoaded(true);
-    setUserPosMarker(userLocation)
+  useEffect(() => {
     // Storage of recovered restaurants from JSON file
-    if(restaurants != null ) {
+    if (restaurants !== null){
       let restoList = []
       restaurants.map(resto => {
         let restoRating = {
@@ -62,6 +34,41 @@ const MapContainer = ( {restaurant: { restaurants },  getRestaurants, myMap: { u
         setRestoAdded(newRestoList)
       })
     }
+  }, [restaurants]);
+
+  useEffect(() => {
+    getUserPosition();
+  }, [getUserPosition]);
+
+  const [searchResults, setSearchResults] = useState([]); // results of nearbySearch request 
+  const [mapsLoaded, setMapsLoaded] = useState(false); // reset to true when api has loaded
+  const [userPos, setUserPos] = useState({"lat": 43.664175, "lng": 7.139873599999987}); // for set center of map with userLocation
+  const [star, setStar ] = useState(1); //filter option
+  const [map, setMap] = useState({}); // for manipulate the map ex: map.getBounds()
+  const [mapsApi, setMapsApi] = useState({}); // to access service ex: mapsApi.Geocoder()
+  const [zoom, setZoom] = useState(15); 
+  const [placesService, setPlacesService] = useState({});
+  const [autoCompleteService, setAutoCompleteService] = useState({});
+  const [geoCoderService, setGeoCoderService] = useState({});
+  // const [infoWindow, setInfoWindow] = useState({});
+  const [restoAdded, setRestoAdded] = useState([]); // user's restaurants list
+  const [visible, setVisible] = useState(false); // set Modal visibility when click we click on map
+  const [name, setName] = useState(''); // set name form all restoAdded in updateName()
+  const [address, setAddress] = useState(''); // set in updateAddress() for all restoAdded
+  const [userPosMarker, setUserPosMarker] = useState({}); 
+  let markers = [];
+
+  // Call when the api has loaded 
+  const apiHasLoaded = ((map, mapsApi) => {
+    setUserPos(userLocation);
+    setUserPosMarker(userLocation);
+    setMap(map);
+    setMapsApi(mapsApi);
+    // setInfoWindow(new mapsApi.InfoWindow());
+    setPlacesService(new mapsApi.places.PlacesService(map));
+    setAutoCompleteService(new mapsApi.places.AutocompleteService());
+    setGeoCoderService(new mapsApi.Geocoder());
+    setMapsLoaded(true);
   });
 
   const { Option } = Select;
@@ -156,7 +163,7 @@ const MapContainer = ( {restaurant: { restaurants },  getRestaurants, myMap: { u
   }
 
   const onStreet = (id) => {
-    let resto = restoAdded.filter( res => res.id == id)
+    let resto = restoAdded.filter( res => res.id === id)
     let location = {
       lat: resto[0].lat,
       lng: resto[0].lng
@@ -200,7 +207,7 @@ const MapContainer = ( {restaurant: { restaurants },  getRestaurants, myMap: { u
                })}
                {restoAdded.map( marker => {
                   return (
-                  <UserMarker  key={marker.id}   lat={marker.lat} lng={marker.lng} name={marker.name} />
+                    <UserMarker  key={marker.id}   lat={marker.lat} lng={marker.lng} name={marker.name} />
                   )
                 })}
                 {userPosMarker && 
@@ -269,7 +276,7 @@ const MapContainer = ( {restaurant: { restaurants },  getRestaurants, myMap: { u
               <ul style={{height: '490px', width:'100%', overflow:'hidden', overflowY: 'scroll', paddingTop: '1%' }}>
               {/* user's restaurants results */}
               <h5>Votre liste</h5>
-              { restoAdded.length == 0 &&
+              { restoAdded.length === 0 &&
               <p style={{color: 'grey'}} >Votre liste est vide</p>
               }
               { restoAdded.length > 0  &&             
@@ -277,10 +284,9 @@ const MapContainer = ( {restaurant: { restaurants },  getRestaurants, myMap: { u
                 <PlaceCard resto={result} key={result.id} onDelete={onDelete} onStreet={onStreet} filterOption={star} /> 
               ))} 
               {/* nearby request results */}
-              
               <h5>Nos résultats</h5>
               {searchResults.map((result) => (
-                <PlaceCard resto={result} key={result.id} onDelete={onDelete}  /> 
+                <PlaceCard resto={result} key={result.id} onDelete={onDelete} filterOption={star} /> 
               ))}          
               </ul>
             </div>
