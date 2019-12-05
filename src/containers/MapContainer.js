@@ -13,9 +13,11 @@ import UserPosMarker from '../components/UserPosMarker';
 const MapContainer = ( {restaurant: { restaurants },  getRestaurants, myMap: { userLocation }, getUserPosition} ) => {
 
   // Call the action that will fetch the restaurants on the server
+  // Call the action that retrieves the user’s position
   useEffect(() => {
     getRestaurants();
-  }, [getRestaurants]);
+    getUserPosition();
+  }, [getRestaurants, getUserPosition]);
 
   // Creates a list from recovered restaurants from JSON file
   useEffect(() => {
@@ -35,11 +37,6 @@ const MapContainer = ( {restaurant: { restaurants },  getRestaurants, myMap: { u
       })
     }
   }, [restaurants]);
-
-  // Call the action that retrieves the user’s position
-  useEffect(() => {
-    getUserPosition();
-  }, [getUserPosition]);
 
   const [searchResults, setSearchResults] = useState([]); // results of nearbySearch request 
   const [mapsLoaded, setMapsLoaded] = useState(false); // reset to true when api has loaded
@@ -134,9 +131,9 @@ const MapContainer = ( {restaurant: { restaurants },  getRestaurants, myMap: { u
     setName(e.target.value);
   };
 
-  // const updateAddress = (e) => {
-  //   setAddress(e.target.value)
-  // }
+  const updateAddress = (e) => {
+    setAddress(e.target.value);
+  };
 
   // Add a new restaurant with the coordinate of the click
   const onMapClick = ({lat, lng}) => {
@@ -181,14 +178,14 @@ const MapContainer = ( {restaurant: { restaurants },  getRestaurants, myMap: { u
       lat: resto[0].lat,
       lng: resto[0].lng
     }
-    let streetV = map.getStreetView()
+    let streetV = map.getStreetView();
     streetV.setPosition(location);
     streetV.setPov(/** @type {google.maps.StreetViewPov} */({
       heading: 265,
       pitch: 0
     }));
-    streetV.setVisible(true)
-  }
+    streetV.setVisible(true);
+  };
 
     return( 
       <div> 
@@ -217,13 +214,13 @@ const MapContainer = ( {restaurant: { restaurants },  getRestaurants, myMap: { u
                 {/* render the list of markers ( for restaurants recovered)*/} 
                 {markers.map(marker => {
                   return (
-                    <MapMarker  key={marker.id} id={marker.id}  lat={marker.lat} lng={marker.lng} name={marker.name} restoUser={false} />
+                    <MapMarker  key={marker.id} id={marker.id}  lat={marker.lat} lng={marker.lng} name={marker.name} restoUser={false} star={star} />
                   );
                })}
                {/* Render the list of markers (for restaurants added)*/} 
                {restoAdded.map( marker => {
                   return (
-                    <MapMarker  key={marker.id} id={marker.id}  lat={marker.lat} lng={marker.lng} name={marker.name} restoUser={true} />
+                    <MapMarker  key={marker.id} id={marker.id}  lat={marker.lat} lng={marker.lng} name={marker.name} restoUser={true} star={star} />
                   )
                 })}
                 {/* Render the user position marker */}
@@ -244,11 +241,11 @@ const MapContainer = ( {restaurant: { restaurants },  getRestaurants, myMap: { u
                     allowClear={true} 
                     placeholder="Nom du Restaurant" 
                     onChange={(event) => updateName(event)} />
-                  {/* <Input
+                  <Input
                     style={{ width: '83%' }}
                     allowClear={true} 
                     placeholder="Adresse du Restaurant" 
-                    onChange={(event) => updateAddress(event)} /> */}
+                    onChange={(event) => updateAddress(event)} />
                 </Modal>
               </div>
             </section>

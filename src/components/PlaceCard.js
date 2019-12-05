@@ -1,6 +1,5 @@
 import React, {useState} from 'react';
-import { Rate, Input, Card, Comment, Tooltip, message } from 'antd';
-import moment from 'moment';
+import { Rate, Input, Card, Comment, message } from 'antd';
 
 const PlaceCard = (({ resto, onDelete, onStreet, filterOption }) => {
 
@@ -118,11 +117,6 @@ const PlaceCard = (({ resto, onDelete, onStreet, filterOption }) => {
                   style={{backgroundColor: 'rgb(255, 255, 255)'}}
                   content={comment}
                   author={<a href="#!">Han Solo</a>}
-                  datetime={
-                    <Tooltip title={moment().format('YYYY-MM-DD   HH:mm:ss')}>
-                      <span>{moment().fromNow()}</span>
-                    </Tooltip>
-                  }
                 />
               </li>
             )

@@ -4,13 +4,14 @@ import { Icon } from 'antd';
 const MapMarker = (props) => {
 
   const [visibility, setVisibility] = useState('hide');
-  const { name, restoUser } = props
-  let colorTone = ''
+  const { name, restoUser } = props;
+  let colorTone = '';
+
   if (restoUser === true ) {
     colorTone = '#FFB310'
   } else {
    colorTone = '#fd0000'
-  }
+  };
 
   const visibilityHandler = () => {
     if (visibility === 'hide') {
@@ -18,7 +19,7 @@ const MapMarker = (props) => {
     } else {
       setVisibility('hide')
     }
-  }
+  };
 
   return (
     <div>
