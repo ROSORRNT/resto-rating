@@ -48,7 +48,6 @@ const MapContainer = ( {restaurant: { restaurants },  getRestaurants, myMap: { u
   const [placesService, setPlacesService] = useState({});
   const [autoCompleteService, setAutoCompleteService] = useState({});
   const [geoCoderService, setGeoCoderService] = useState({});
-  // const [infoWindow, setInfoWindow] = useState({});
   const [restoAdded, setRestoAdded] = useState([]); // user's restaurants list
   const [visible, setVisible] = useState(false); // set Modal visibility when click we click on map
   const [name, setName] = useState(''); // set name form all restoAdded in updateName()
@@ -61,8 +60,6 @@ const MapContainer = ( {restaurant: { restaurants },  getRestaurants, myMap: { u
     setUserPos(userLocation);
     setUserPosMarker(userLocation);
     setMap(map);
-    setMapsApi(mapsApi);
-    // setInfoWindow(new mapsApi.InfoWindow());
     setPlacesService(new mapsApi.places.PlacesService(map));
     setAutoCompleteService(new mapsApi.places.AutocompleteService());
     setGeoCoderService(new mapsApi.Geocoder());

@@ -75,7 +75,7 @@ const PlaceCard = (({ resto, onDelete, onStreet, filterOption }) => {
           
           { resto.photo == null && 
             <a href="#!" 
-              onClick={(id) => onStreet(resto.id)} 
+              onClick={() => onStreet(resto.id)} 
               className="secondary-content">
               <i className="material-icons grey-text">visibility</i>
             </a>
