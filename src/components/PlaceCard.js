@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import { Rate, Input, Card, Comment, message } from 'antd';
 
-const PlaceCard = (({ resto, onDelete, onStreet, filterOption }) => {
+const PlaceCard = (({ resto, onDelete, onStreet, filterOption, restoUser, placesService }) => {
 
   const [showInput, setShowInput] = useState(false);
   const [showPhoto, setShowPhoto] = useState(false);
@@ -12,17 +12,37 @@ const PlaceCard = (({ resto, onDelete, onStreet, filterOption }) => {
       return sum + stars
   }, 0) / arrayStars.length)
   let commentList = [...resto.comments];
-  const [comments, setComments] = useState(commentList); 
+  const [comments, setComments] = useState(commentList);
+  const [authors, setAuthors] = useState([]); 
   const [stars, setStars] = useState(starsAverage);
   const [canRate, setCanRate] = useState(true);
+
 
   const showPhotoHandler = () => {
     setShowPhoto(!showPhoto);
   }
 
   const showCommentHandler = () => {
+    if(restoUser === false && showComments === false && comments.length === 0) {
+      const req = {
+        placeId: resto.placeId,
+        fields: ['reviews']
+      };
+      placesService.getDetails(req, (res => {
+        let commentsList = []
+        res.reviews.map( res => {
+          commentsList.push({text : res.text, author: res.author_name})
+        });
+        let newComments = [
+          ...comments,
+          ...commentsList
+        ];
+        setComments(newComments);
+        setShowComments(true);
+      }));
+    }
     setShowComments(!showComments)
-  }
+  };
 
   const commentEdit = (e) => {
     let newComments = [
@@ -109,14 +129,30 @@ const PlaceCard = (({ resto, onDelete, onStreet, filterOption }) => {
           allowClear={true}
           onPressEnter={(e) => commentEdit(e)} />
         }
+        {/* iteration du composant Comment */}
         <ul>
-          {showComments && comments.map( comment => {
+          {restoUser 
+          && showComments 
+          && comments.map( comment => {
             return (
               <li key={Math.random()}>
                 <Comment 
                   style={{backgroundColor: 'rgb(255, 255, 255)'}}
                   content={comment}
-                  author={<a href="#!">Han Solo</a>}
+                  author={<span style={{fontStyle: 'bold', fontSize: '16px'}}>Han Solo</span>}
+                />
+              </li>
+            )
+          })}
+          {restoUser === false 
+          && showComments 
+          && comments.map( comment => {
+            return (
+              <li key={Math.random()}>
+                <Comment 
+                  style={{backgroundColor: 'rgb(255, 255, 255)'}}
+                  content={comment.text}
+                  author={<span style={{fontStyle: 'bold', fontSize: '16px'}}>{comment.author}</span>}
                 />
               </li>
             )
