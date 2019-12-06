@@ -26,8 +26,9 @@ const MapContainer = ( {restaurant: { restaurants },  getRestaurants, myMap: { u
       restaurants.map(resto => {
         let restoRating = {
           stars: resto.ratings.map( res => res.stars),
-          comment: resto.ratings.map( res => res.comment)
+          comment: resto.ratings.map( res =>  res.comment = {text: res.comment, author: 'Han Solo' })
         }
+        console.log( restoRating.comment)
         let userResto = {id: resto.id, address: resto.address, lat: resto.coordinates.lat, lng: resto.coordinates.lng, name: resto.name, stars: restoRating.stars, comments: restoRating.comment, photo: null, restoUser: true }
         restoList.push(userResto) 
         let newRestoList = [

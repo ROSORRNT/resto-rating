@@ -13,10 +13,8 @@ const PlaceCard = (({ resto, onDelete, onStreet, filterOption, restoUser, places
   }, 0) / arrayStars.length)
   let commentList = [...resto.comments];
   const [comments, setComments] = useState(commentList);
-  const [authors, setAuthors] = useState([]); 
   const [stars, setStars] = useState(starsAverage);
   const [canRate, setCanRate] = useState(true);
-
 
   const showPhotoHandler = () => {
     setShowPhoto(!showPhoto);
@@ -129,23 +127,8 @@ const PlaceCard = (({ resto, onDelete, onStreet, filterOption, restoUser, places
           allowClear={true}
           onPressEnter={(e) => commentEdit(e)} />
         }
-        {/* iteration du composant Comment */}
         <ul>
-          {restoUser 
-          && showComments 
-          && comments.map( comment => {
-            return (
-              <li key={Math.random()}>
-                <Comment 
-                  style={{backgroundColor: 'rgb(255, 255, 255)'}}
-                  content={comment}
-                  author={<span style={{fontStyle: 'bold', fontSize: '16px'}}>Han Solo</span>}
-                />
-              </li>
-            )
-          })}
-          {restoUser === false 
-          && showComments 
+          {showComments 
           && comments.map( comment => {
             return (
               <li key={Math.random()}>
