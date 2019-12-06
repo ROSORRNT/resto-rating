@@ -3,11 +3,11 @@ import GoogleMapReact from 'google-map-react';
 import { connect } from 'react-redux';
 import { getUserPosition } from '../actions/mapActions';
 import { getRestaurants } from '../actions/restaurantActions';
-import { Select, Modal, Input, message } from 'antd';
+import { Select, Modal, Input, message, Button } from 'antd';
 import MapMarker from '../components/MapMarker';
 import PlaceCard from '../components/PlaceCard';
 import MapStyle from '../components/Layout/MapStyle';
-import MapAutoComplete from '../components/MapAutoComplete';
+// import MapAutoComplete from '../components/MapAutoComplete';
 import UserPosMarker from '../components/UserPosMarker';
 
 const MapContainer = ( {restaurant: { restaurants },  getRestaurants, myMap: { userLocation }, getUserPosition} ) => {
@@ -38,9 +38,16 @@ const MapContainer = ( {restaurant: { restaurants },  getRestaurants, myMap: { u
     }
   }, [restaurants]);
 
+  useEffect(() => {
+    if (userLocation.permision === false) {
+      message.error('Géolocalisation bloquée', 4);
+      userLocation = {lat: 43.6535296, lng: 7.1458816, permision: false }
+    } 
+  }, [userLocation])
+
   const [searchResults, setSearchResults] = useState([]); // results of nearbySearch request 
   const [mapsLoaded, setMapsLoaded] = useState(false); // reset to true when api has loaded
-  const [userPos, setUserPos] = useState({"lat": 43.664175, "lng": 7.139873599999987}); // for set center of map with userLocation
+  const [userPos, setUserPos] = useState({lat: 43.6535296, lng: 7.1458816, permision: false}); // for set center of map with userLocation
   const [star, setStar ] = useState(1); //filter option
   const [map, setMap] = useState({}); // for manipulate the map ex: map.getBounds()
   const [mapsApi, setMapsApi] = useState({}); // to access service ex: mapsApi.Geocoder()
@@ -48,6 +55,7 @@ const MapContainer = ( {restaurant: { restaurants },  getRestaurants, myMap: { u
   const [placesService, setPlacesService] = useState({});
   const [autoCompleteService, setAutoCompleteService] = useState({});
   const [geoCoderService, setGeoCoderService] = useState({});
+  const [searchIsStarted, setSearchIsStarted] = useState(false);
   const [restoAdded, setRestoAdded] = useState([]); // user's restaurants list
   const [visible, setVisible] = useState(false); // set Modal visibility when click we click on map
   const [name, setName] = useState(''); // set name form all restoAdded in updateName()
@@ -69,7 +77,7 @@ const MapContainer = ( {restaurant: { restaurants },  getRestaurants, myMap: { u
   // Set options of the map
   const { Option } = Select;
   const createMapOptions = (() => {
-    return {styles: MapStyle,
+    return {styles: MapStyle, 
       streetViewControl: false }
   })
 
@@ -84,6 +92,7 @@ const MapContainer = ( {restaurant: { restaurants },  getRestaurants, myMap: { u
 
   // Called on the first loading, each time an option has selected, and when a change occurs on the map
   const handleSearch = ((value) => { 
+    setSearchIsStarted(true);
     setStar(value); // Set with option selected for filter (star)
     const filteredResults = [];
     const placesRequest = {
@@ -92,6 +101,7 @@ const MapContainer = ( {restaurant: { restaurants },  getRestaurants, myMap: { u
       type: ['restaurant'], 
     };
     placesService.nearbySearch(placesRequest, ((response) => {
+
       let filtered = response.filter( res => res.rating >= value)
       let photoUrl = ''
       filtered.map( res => {
@@ -99,7 +109,7 @@ const MapContainer = ( {restaurant: { restaurants },  getRestaurants, myMap: { u
             photoUrl = res.photos[0].getUrl()
         }
         const restoPlace = {
-          id: res.id, name: res.name, photo: photoUrl, restoUser: false, stars: [res.rating], comments: [], address:res.vicinity, coordinates: { lat:res.geometry.location.lat(),lng:res.geometry.location.lng() } 
+          id: res.id, placeId: res.place_id, name: res.name, photo: photoUrl, restoUser: false, stars: [res.rating], comments: [], address:res.vicinity, coordinates: { lat:res.geometry.location.lat(),lng:res.geometry.location.lng() } 
         };
         filteredResults.push(restoPlace);
      })
@@ -189,7 +199,7 @@ const MapContainer = ( {restaurant: { restaurants },  getRestaurants, myMap: { u
         <div className="row">
           <div >    
             <section className="col s8 right">
-              <div style={{ height: '100vh', width: 'auto'}} >
+              <div style={{ height: '100vh', width: 'auto', right: '0'}} >
                 <GoogleMapReact
                   bootstrapURLKeys={{
                     key: 'AIzaSyBIWvyyq6RD5MTxy2Rpd24ZLO_0kYAaDLw',
@@ -215,14 +225,15 @@ const MapContainer = ( {restaurant: { restaurants },  getRestaurants, myMap: { u
                   );
                })}
                {/* Render the list of markers (for restaurants added)*/} 
-               {restoAdded.map( marker => {
+               { searchIsStarted &&      
+                 restoAdded.map( marker => {
                   return (
                     <MapMarker  key={marker.id} id={marker.id}  lat={marker.lat} lng={marker.lng} name={marker.name} restoUser={true} star={star} />
                   )
                 })}
                 {/* Render the user position marker */}
-                {userPosMarker && 
-                  <UserPosMarker key={new Date()} name="userPosition" lat={userPosMarker.lat} lng={userPosMarker.lng}  />
+                {userPosMarker && userLocation.permision &&
+                  <UserPosMarker key={new Date()} name="userPosition" lat={userLocation.lat} lng={userLocation.lng}  />
                 }
                 </GoogleMapReact> 
 
@@ -247,9 +258,9 @@ const MapContainer = ( {restaurant: { restaurants },  getRestaurants, myMap: { u
               </div>
             </section>
           </div>
-
-        <section  style={{paddingTop: '1px'}} className="col s4 left">
+        <section  style={{paddingTop: '12px', paddingLeft: 'auto', paddingRight: '0'}} className="col s4 left">
           <div >
+          {/* Adding restaurant with autoCompleteService
           {mapsLoaded &&
             <React.Fragment>
                 <Input
@@ -264,10 +275,12 @@ const MapContainer = ( {restaurant: { restaurants },  getRestaurants, myMap: { u
                   map={map}
                 />
             </React.Fragment>
-          }
+          } */}
+            <Button type="primary" ghost block onClick={onChangeHandler} icon="search">Lancer une recherche</Button>
             <Select
+              block
               showSearch
-              style={{ width: '90%', paddingTop: '3%' }}
+              style={{ width: '100%', paddingTop: '3%' }}
               placeholder="Note minimale"
               optionFilterProp="children"
               onChange={(value) => handleSearch(value)}
@@ -283,7 +296,7 @@ const MapContainer = ( {restaurant: { restaurants },  getRestaurants, myMap: { u
             {/* Qwery Results */}
           {searchResults.length > 0 ?
             <div>
-              <ul style={{height: '490px', width:'100%', overflow:'hidden', overflowY: 'scroll', paddingTop: '1%' }}>
+              <ul style={{height: '510px', width:'100%', overflow:'hidden', overflowY: 'scroll', marginTop: '12px' }}>
               {/* user's restaurants results */}
               <h5>Votre liste</h5>
               { restoAdded.length === 0 &&
@@ -291,12 +304,26 @@ const MapContainer = ( {restaurant: { restaurants },  getRestaurants, myMap: { u
               }
               { restoAdded.length > 0  &&             
                 restoAdded.map((result) => (
-                <PlaceCard resto={result} key={result.id} onDelete={onDelete} onStreet={onStreet} filterOption={star} /> 
+                <PlaceCard resto={result} 
+                  key={result.id} 
+                  onDelete={onDelete} 
+                  onStreet={onStreet}
+                  filterOption={star} 
+                  restoUser={true}
+                  placesService={placesService} 
+                /> 
               ))} 
               {/* nearby request results */}
               <h5>Nos résultats</h5>
               {searchResults.map((result) => (
-                <PlaceCard resto={result} key={result.id} onDelete={onDelete} filterOption={star} /> 
+                <PlaceCard 
+                  resto={result} 
+                  key={result.id} 
+                  onDelete={onDelete} 
+                  filterOption={star} 
+                  placesService={placesService} 
+                  restoUser={false} 
+                /> 
               ))}          
               </ul>
             </div>
