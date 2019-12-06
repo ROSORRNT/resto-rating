@@ -4,8 +4,8 @@ import {
 
 const initialState = {
     userLocation: {
-      lat: '43.912190', 
-      lng: '6.794206'
+        lat: 43.6535296, 
+        lng: 7.1458816
     }
 };
 
